@@ -85,7 +85,7 @@ The game is built using vanilla JavaScript with GSAP for animations. It features
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/modern-2048.git
+git clone https://github.com/lazzerex/Neo2048.git
 ```
 
 2. Open `index.html` in your browser or serve through a local web server
