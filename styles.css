@@ -1,0 +1,808 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #faf8ef;
+    color: #776e65;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    transition: background-color 0.3s ease;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    transform: scale(1);
+    transition: transform 0.2s ease;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    animation: fadeInDown 0.5s ease-out;
+}
+
+h1 {
+    font-size: 48px;
+    font-weight: bold;
+    color: #776e65;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+h1:hover {
+    transform: scale(1.05);
+}
+
+.scores-container {
+    display: flex;
+    gap: 10px;
+}
+
+.score-box {
+    background: #bbada0;
+    padding: 10px 20px;
+    border-radius: 6px;
+    color: white;
+    text-align: center;
+    min-width: 100px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.score-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.score-label {
+    display: block;
+    font-size: 14px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+#score, #best-score {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.game-container {
+    background: #bbada0;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    animation: fadeInUp 0.5s ease-out;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-rows: repeat(4, 1fr);
+    gap: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.grid-cell {
+    background: rgba(238, 228, 218, 0.35);
+    border-radius: 3px;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    transition: transform 0.1s ease;
+    position: relative;
+    z-index: 0;
+}
+
+.tile {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #eee4da;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 35px;
+    font-weight: bold;
+    color: #776e65;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: default;
+    user-select: none;
+    z-index: 2;
+    transition: background-color 0.1s ease;
+}
+
+/* Add a subtle trail effect for sliding tiles */
+.tile::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 3px;
+    opacity: 0;
+    background: inherit;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Animation for the tile trail effect */
+@keyframes trail-fade {
+    0% {
+        opacity: 0.3;
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+/* Class to add to tiles that are moving */
+.tile.sliding::after {
+    animation: trail-fade 0.25s ease-out;
+}
+
+.tile.merged {
+    z-index: 3; /* Ensure merged tiles appear on top */
+}
+
+.tile[data-value="2"] { background: #eee4da; }
+.tile[data-value="4"] { background: #ede0c8; }
+.tile[data-value="8"] { background: #f2b179; color: white; }
+.tile[data-value="16"] { background: #f59563; color: white; }
+.tile[data-value="32"] { background: #f67c5f; color: white; }
+.tile[data-value="64"] { background: #f65e3b; color: white; }
+.tile[data-value="128"] { background: #edcf72; color: white; font-size: 30px; }
+.tile[data-value="256"] { background: #edcc61; color: white; font-size: 30px; }
+.tile[data-value="512"] { background: #edc850; color: white; font-size: 30px; }
+.tile[data-value="1024"] { background: #edc53f; color: white; font-size: 25px; }
+.tile[data-value="2048"] { background: #edc22e; color: white; font-size: 25px; }
+
+.controls {
+    text-align: center;
+}
+
+#new-game {
+    background: #8f7a66;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+#new-game:hover {
+    background: #7f6a56;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#new-game:active {
+    transform: translateY(0);
+}
+
+.game-intro {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.game-explanation {
+    font-size: 14px;
+    color: #776e65;
+}
+
+@media (max-width: 520px) {
+    .container {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 36px;
+    }
+    
+    .score-box {
+        padding: 8px 15px;
+        min-width: 80px;
+    }
+    
+    .tile {
+        width: 80px;
+        height: 80px;
+        font-size: 30px;
+    }
+    
+    .tile[data-value="128"],
+    .tile[data-value="256"],
+    .tile[data-value="512"] {
+        font-size: 25px;
+    }
+    
+    .tile[data-value="1024"],
+    .tile[data-value="2048"] {
+        font-size: 20px;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes appear {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes merge {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.game-over {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(238, 228, 218, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-in-out;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.game-over-content {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    animation: slideIn 0.3s ease-in-out;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(0);
+    transition: transform 0.2s ease;
+}
+
+.game-over-content:hover {
+    transform: translateY(-2px);
+}
+
+.game-over h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #776e65;
+}
+
+.game-over p {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #776e65;
+}
+
+.game-over button {
+    background: #8f7a66;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.game-over button:hover {
+    background: #7f6a56;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.game-over.win {
+    background: rgba(237, 194, 46, 0.95);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.score-addition {
+    position: absolute;
+    right: 30px;
+    color: #65B446;
+    font-size: 25px;
+    font-weight: bold;
+    animation: score-pop 0.5s ease-in-out;
+    pointer-events: none;
+}
+
+.best-score-updated {
+    animation: score-highlight 0.5s ease-in-out;
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    animation: confetti-fall 3s ease-in-out forwards;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+@keyframes score-pop {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-20px) scale(1.2);
+    }
+    100% {
+        transform: translateY(-40px) scale(1);
+        opacity: 0;
+    }
+}
+
+@keyframes score-highlight {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+        color: #65B446;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-10vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.final-score {
+    font-size: 24px;
+    color: #65B446;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.achievement {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin: 15px 0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    animation: achievement-glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes achievement-glow {
+    from {
+        box-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFA500;
+    }
+    to {
+        box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFA500;
+    }
+}
+
+.game-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #faf8ef;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.menu-content {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+    width: 90%;
+    animation: menuAppear 0.5s ease-out;
+}
+
+.menu-content h1 {
+    font-size: 72px;
+    margin-bottom: 30px;
+    background: linear-gradient(45deg, #776e65, #bbada0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+}
+
+.menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.menu-button {
+    background: #8f7a66;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.menu-button:hover {
+    background: #7f6a56;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.menu-button:active {
+    transform: translateY(0);
+}
+
+.difficulty-selector {
+    background: #eee4da;
+    padding: 15px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+}
+
+.difficulty-selector span {
+    font-size: 16px;
+    color: #776e65;
+    font-weight: bold;
+}
+
+.difficulty-selector select {
+    padding: 8px;
+    border: 2px solid #bbada0;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #776e65;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.difficulty-selector select:hover {
+    border-color: #8f7a66;
+}
+
+.menu-footer {
+    font-size: 18px;
+    color: #776e65;
+}
+
+.menu-footer p {
+    margin: 0;
+}
+
+#menu-best-score {
+    font-weight: bold;
+    color: #65B446;
+}
+
+.how-to-play-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    z-index: 2001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.how-to-play-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.how-to-play-modal h2 {
+    color: #776e65;
+    margin-bottom: 20px;
+}
+
+.how-to-play-modal p {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.how-to-play-modal .close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #776e65;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.2s ease;
+}
+
+.how-to-play-modal .close-button:hover {
+    transform: scale(1.1);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+@keyframes menuAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Add these styles to your CSS file */
+
+/* Improved tile styling */
+.tile {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #eee4da;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 35px;
+    font-weight: bold;
+    color: #776e65;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: default;
+    user-select: none;
+    z-index: 2;
+    transition: background-color 0.1s ease;
+}
+
+/* Style for ghost tiles used in merge animations */
+.tile.ghost {
+    opacity: 0.7;
+    z-index: 1;
+    pointer-events: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Add smooth color transitions for all tiles */
+.tile[data-value="2"] { background: #eee4da; }
+.tile[data-value="4"] { background: #ede0c8; }
+.tile[data-value="8"] { background: #f2b179; color: white; }
+.tile[data-value="16"] { background: #f59563; color: white; }
+.tile[data-value="32"] { background: #f67c5f; color: white; }
+.tile[data-value="64"] { background: #f65e3b; color: white; }
+.tile[data-value="128"] { background: #edcf72; color: white; font-size: 30px; }
+.tile[data-value="256"] { background: #edcc61; color: white; font-size: 30px; }
+.tile[data-value="512"] { background: #edc850; color: white; font-size: 30px; }
+.tile[data-value="1024"] { background: #edc53f; color: white; font-size: 25px; }
+.tile[data-value="2048"] { background: #edc22e; color: white; font-size: 25px; }
+
+/* Ensure grid cells are positioned correctly for positioning tiles */
+.grid-cell {
+    background: rgba(238, 228, 218, 0.35);
+    border-radius: 3px;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    position: relative;
+    z-index: 0;
+}
+
+/* Animation for new tiles appearing */
+@keyframes tileAppear {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Animation for merged tiles */
+@keyframes tileMerge {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Improved game container styling */
+.game-container {
+    background: #bbada0;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    animation: fadeInUp 0.5s ease-out;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.tile-container {
+    position: absolute;
+    z-index: 2;
+}
+
+/* Ensure proper stacking for all animation states */
+.grid-container {
+    position: relative;
+    z-index: 1;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-rows: repeat(4, 1fr);
+    gap: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.tile.ghost {
+    opacity: 0.7;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.tile:not(.ghost) {
+    z-index: 2;
+}
+
+.merged {
+    z-index: 3;
+}
