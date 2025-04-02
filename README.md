@@ -1,6 +1,12 @@
 # Modern 2048
 
 A sleek and modern implementation of the classic 2048 puzzle game, featuring smooth animations, responsive design, and enhanced gameplay features.
+Try it here: https://neo2048.vercel.app/
+
+![image](https://github.com/user-attachments/assets/b85a8651-aeb3-4d35-b38b-ed85634eab92)
+![image](https://github.com/user-attachments/assets/d4164dcf-6588-4512-a519-169b75ae28a4)
+
+
 
 ## Features
 
